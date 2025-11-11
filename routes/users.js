@@ -23,8 +23,8 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "note"
     }],
-    gallery: [{ // Add gallery field as an array
-        type: String // Assuming each element is a URL to the photo
+    gallery: [{ 
+        type: String 
     }]
 });
 
