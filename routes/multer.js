@@ -1,19 +1,21 @@
-const multer = require("multer")
-const { v4: uuid4 } = require("uuid")
-const path = require("path")
+const multer = require("multer");
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD,
+    api_key: process.env.CLOUDINARY_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET,
+});
 
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/images/uploads')
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: {
+        folder: "tweet-nepal-uploads",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
+        public_id: (req, file) => Date.now().toString(),
     },
-    filename: function (req, file, cb) {
-        const unique = uuid4();
-        cb(null, unique + path.extname(file.originalname))
-    }
-})
+});
 
-const upload = multer({ storage: storage })
-
-module.exports = upload
+const upload = multer({ storage });
+module.exports = upload;

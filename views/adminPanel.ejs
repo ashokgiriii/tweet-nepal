@@ -223,7 +223,7 @@
                                                 <%=eachPost.content%>
                                             </td>
                                             <td>
-                                                <img src="<%= eachPost.picture ? '/images/uploads/' + eachPost.picture : '/images/default.jpg' %>"
+                                                <img src="<%= eachPost.picture ? eachPost.picture : '/images/default.jpg' %>"
                                                     alt="">
 
                                             </td>
@@ -245,7 +245,7 @@
                         </td>
                         <td>ashok giri</td>
                         <td>
-                            <img src="<%= eachUser.userPhoto ? '/images/uploads/' + eachUser.userPhoto : '/images/nouser.webp' %>"
+                            <img src="<%= eachUser.userPhoto ? eachUser.userPhoto : '/images/nouser.webp' %>"
                                 alt="">
                         </td>
                         <td>
@@ -330,7 +330,7 @@
                 const username = row.querySelector(".username").textContent.toLowerCase();
                 if (username.includes(searchTerm)) {
                     row.style.display = "table-row";
-                    row.style.backgroundColor = "#333"; // Set background color to red
+                   
                 } else {
                     row.style.display = "none";
                 }

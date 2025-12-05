@@ -8,15 +8,10 @@
     padding: 0;
     list-style: none;
     text-decoration: none;
-    font-family: serif;
     box-sizing: border-box;
-    font-family: popins;
     font-family: Arial, Helvetica, sans-serif;
     color: hsl(0, 0%, 80%);
     letter-spacing: 1px;
-    font-family: monospace;
-    font-family: sans-serif;
-    letter-spacing: 1 px;
 }
 
 
@@ -311,7 +306,7 @@ main {
     gap: 1rem;
     padding: 10px;
     border-radius: 10px;
-    border: 1px solid var(--yellow);
+    /* border: 1px solid var(--yellow); */
     transform: translateY(-145%);
     transition: .2s linear;
 }
@@ -412,7 +407,6 @@ section {
     padding-bottom: 10px;
     position: relative;
     border-bottom: 1px solid var(--border_color);
-    background: red;
     background: var(--border_color);
     border-radius: 10px;
     /* padding: 10px; */
@@ -522,7 +516,7 @@ section a i.ri-delete-bin-fill {
 }
 
 section .post .post-image-wrap {
-    width: 100%;
+    width: 80%;
     display: flex;
     justify-content: space-between;
 }
@@ -530,7 +524,7 @@ section .post .post-image-wrap {
 section .post img {
     border-radius: 10px;
     border: 1px solid var(--border_color);
-    max-height: 80vh;
+    max-height: 70vh;
     object-fit: contain;
     object-position: left;
     max-width: fit-content;
@@ -742,7 +736,6 @@ section.clicked-post.view-comment-post .user-info.commenters {
 }
 
 section.clicked-post.view-comment-post div.flex-column {
-    /* background: red; */
     display: flex;
     flex-direction: column;
     gap: 5px;
@@ -781,7 +774,6 @@ section a.view-all-comments {
     position: relative;
     min-height: 2rem;
     margin-top: 10px;
-    /* background: red; */
 }
 
 .main-section-post-div form.write-comment-from-post textarea {
@@ -923,7 +915,6 @@ section a.view-all-comments {
 
 
 #right-side ul div {
-    /* background: red; */
     display: flex;
     flex-direction: column;
     align-items: flex-start;

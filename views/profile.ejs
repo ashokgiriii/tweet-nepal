@@ -156,7 +156,7 @@
                             Log Out <span class="username">@<%=user.username%></span>
                         </a>
                     </div>
-                    <img src="<%= user.userPhoto ? '/images/uploads/' + user.userPhoto : '/images/nouser.webp' %>"
+                    <img src="<%= user.userPhoto ? user.userPhoto : '/images/nouser.webp' %>"
                         alt="">
 
                     <div class="span">
@@ -181,7 +181,7 @@
                         </a>
 
                         <div class="user-info">
-                            <img src="<%= user.userPhoto ? '/images/uploads/' + user.userPhoto : '/images/nouser.webp' %>"
+                            <img src="<%= user.userPhoto ? user.userPhoto : '/images/nouser.webp' %>"
                                 alt="">
                             <a href="/<%=user.username%>" class="username-and-date">
                                 <p class="username">@<%=user.username%>
@@ -209,7 +209,7 @@
                             </p>
 
                             <% if (elem.picture) { %>
-                                <img src="/images/uploads/<%= elem.picture %>" alt="" class="post-image">
+                                <img src="<%= elem.picture %>" alt="" class="post-image">
                                 <% } %>
 
                         </div>
@@ -236,7 +236,7 @@
                 </h4>
                 <div class="photo-gallery">
                     <% user.gallery.reverse().forEach((eachPhoto)=> { %>
-                        <img src="/images/uploads/<%= eachPhoto %>" alt="">
+                        <img src="<%= eachPhoto %>" alt="">
                         <% }) %>
                 </div>
 

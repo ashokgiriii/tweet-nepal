@@ -1,56 +1,19 @@
-var express = require('express');
-var router = express.Router();
-var userModel = require("./users")
-var passport = require('passport')
-var localStrategy = require('passport-local')
-var upload = require('./multer')
-var postModel = require('./post')
-const commentModel = require("./comment")
-var noteModel = require('./note')
-var adminModel = require('./admin')
+const express = require('express');
+const router = express.Router();
+const passport = require('passport');
+const localStrategy = require('passport-local');
 
+const userModel = require('./users');
+const postModel = require('./post');
+const commentModel = require('./comment');
+const noteModel = require('./note');
+const adminModel = require('./admin');
+const upload = require('./multer');
+const { formatPostDate, truncateText } = require('../utils/helpers');
+const { isLoggedIn, isAdmin } = require('../middleware/auth');
 
-passport.use(new localStrategy(userModel.authenticate()))
-
-// date formation function
-function formatPostDate(date) {
-  const currentDate = new Date();
-  const postDate = new Date(date);
-  const timeDifference = currentDate.getTime() - postDate.getTime();
-
-  // Convert milliseconds to seconds
-  const seconds = Math.floor(timeDifference / 1000);
-
-  // Calculate the appropriate time units
-  const intervals = {
-    year: 31536000,
-    month: 2592000,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60
-  };
-
-  let timeAgo;
-  for (const [unit, secondsPerUnit] of Object.entries(intervals)) {
-    const interval = Math.floor(seconds / secondsPerUnit);
-    if (interval > 0) {
-      timeAgo = `${interval} ${unit}${interval !== 1 ? 's' : ''} ago`;
-      break;
-    }
-  }
-
-  return timeAgo || 'Just now';
-}
-
-// truncate function
-function truncateText(text, maxLength) {
-  if (text.length > maxLength) {
-    return text.substring(0, maxLength) + '...';
-  } else {
-    return text;
-  }
-}
+// Passport configuration
+passport.use(new localStrategy(userModel.authenticate()));
 
 /* GET home page. */
 router.get('/', async function (req, res) {
@@ -128,13 +91,6 @@ router.post('/admin/login', async (req, res) => {
   }
 });
 
-// Admin login middleware
-function isAdmin(req, res, next) {
-  if (req.session.isAdminLoggedIn) { // Check if admin is logged in
-    return next();
-  }
-  res.redirect("/adminLogin"); // Redirect to admin login if not logged in
-}
 
 
 // Delete user route
@@ -303,16 +259,22 @@ router.get("/post/:id", isLoggedIn, async (req, res) => {
         }
       }).populate("user")
 
+    // Check if post exists
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+
     //  Fetch all notes from the database
     const allNotes = await noteModel.find().populate("user");
 
     post.formatPostDate = formatPostDate(post.createdAt);
 
     // Format comment creation dates
-
-    post.comments.forEach((elem) => {
-      elem.time = formatPostDate(elem.createdAt)
-    })
+    if (post.comments && post.comments.length > 0) {
+      post.comments.forEach((elem) => {
+        elem.time = formatPostDate(elem.createdAt)
+      })
+    }
 
     const fiveUsers = await userModel.find({}).limit(5);
     res.render("singlepost", { user, post, fiveUsers, allNotes });
@@ -453,70 +415,38 @@ router.post('/checkUsername', async function (req, res) {
 
 
 // edit profile
-// Edit profile
 router.post("/editProfile", upload.single("userPhoto"), async (req, res) => {
-  try {
-    const username = req.body.username;
-    const name = req.body.name;
-    let userPhoto;
+  const user = await userModel.findOne({ username: req.session.passport.user });
 
-    // Check if a new photo is uploaded
-    if (req.file) {
-      userPhoto = req.file.filename;
-    }
+  if (req.body.username) user.username = req.body.username;
+  if (req.body.name) user.name = req.body.name;
 
-    // Find the user by username
-    const user = await userModel.findOne({ username: req.session.passport.user });
-
-    // Update the user's data based on the provided fields
-    if (username) {
-      user.username = username;
-    }
-    if (name) {
-      user.name = name;
-    }
-    if (userPhoto) {
-      user.userPhoto = userPhoto;
-    }
-
-    // Save the updated user data
-    await user.save();
-
-    res.redirect("/index");
-  } catch (error) {
-    console.error("Error editing profile:", error);
-    res.status(500).send("Internal Server Error");
+  if (req.file) {
+    user.userPhoto = req.file.path;  // Cloudinary returns full URL
+    user.gallery.push(req.file.path);
   }
+
+  await user.save();
+  res.redirect("/index");
 });
 
 
 
-// edit profile picture
 router.post("/updateProfilePicture", upload.single("userPhoto"), async (req, res) => {
-  try {
-    // Find the user by username
-    const user = await userModel.findOne({ username: req.session.passport.user });
+  const user = await userModel.findOne({ username: req.session.passport.user });
 
-    // Check if a new photo is uploaded
-    if (req.file) {
-      // If a new photo is uploaded, update the profile picture
-      user.userPhoto = req.file.filename;
-
-      // Add the new photo to the gallery
-      if (!user.gallery.includes(req.file.filename)) {
-        user.gallery.push(req.file.filename);
-      }
+  if (req.file) {
+    user.userPhoto = req.file.path;
+    if (!user.gallery.includes(req.file.path)) {
+      user.gallery.push(req.file.path);
     }
-
-    // Save the updated user data
-    await user.save();
-
-    res.redirect("back");
-  } catch (error) {
-    console.error("Error updating profile picture:", error);
-    res.status(500).send("Internal Server Error");
   }
+
+  await user.save();
+  res.redirect("back");
 });
+
+
 
 
 
@@ -569,37 +499,40 @@ router.post('/post/:postId/comment', isLoggedIn, async (req, res) => {
 router.post("/createPost", isLoggedIn, upload.single("picture"), async (req, res) => {
   const user = await userModel.findOne({ username: req.session.passport.user });
 
-  let pictureFileName = null;
+  let pictureURL = null;
+
   if (req.file) {
-    pictureFileName = req.file.filename;
+    // Use full Cloudinary URL
+    pictureURL = req.file.path || req.file.secure_url;
+    console.log("Post picture URL:", pictureURL);
+    console.log("File uploaded:", req.file);
+
   }
 
-  // Check if any of the fields (picture, title, content) is provided
-  if (pictureFileName || req.body.title || req.body.content) {
-    // Check if title exceeds 70 characters
+  if (pictureURL || req.body.title || req.body.content) {
     if (req.body.title && req.body.title.length > 70) {
-      return res.status(400).send("Title must be less than or equal to 70 characters.");
+      return res.status(400).send("Title must be <= 70 characters.");
     }
 
-    // Check if content exceeds 4000 characters
     if (req.body.content && req.body.content.length > 4000) {
-      return res.status(400).send("Content must be less than or equal to 4000 characters.");
+      return res.status(400).send("Content must be <= 4000 characters.");
     }
 
     const post = await postModel.create({
-      picture: pictureFileName,
+      picture: pictureURL,  // now stores full Cloudinary URL
       title: req.body.title,
       user: user._id,
       content: req.body.content
     });
 
-    // Update user's posts array
     user.posts.push(post._id);
     await user.save();
   }
 
   res.redirect("back");
 });
+
+
 
 
 
@@ -629,13 +562,5 @@ router.get("/logout/destroySession", (req, res, next) => {
 
 
 
-//  is logged in 
-function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-
-  }
-  res.redirect("/")
-}
 
 module.exports = router;

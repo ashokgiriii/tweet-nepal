@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 const plm = require("passport-local-mongoose");
-require('dotenv').config();
 
-
-
-mongoose.connect("mongodb://localhost/tweet")
 
 const userSchema = new mongoose.Schema({
     name: String,
@@ -23,8 +19,8 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "note"
     }],
-    gallery: [{ 
-        type: String 
+    gallery: [{
+        type: String
     }]
 });
 

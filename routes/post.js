@@ -3,10 +3,10 @@ const postSchema = new mongoose.Schema({
     title: String,
     picture: String,
     content: String,
-    user: [{
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
-    }],
+    },
     date: {
         type: Date,
         default: Date.now()

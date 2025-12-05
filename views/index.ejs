@@ -157,10 +157,7 @@
                         </a>
                     </div>
 
-                    <img src="<%= user.userPhoto ? '/images/uploads/' + user.userPhoto : '/images/nouser.webp' %>"
-                        alt="">
-
-
+                   <img src="<%= user.userPhoto ? user.userPhoto : '/images/nouser.webp' %>" alt="">
                     <div class="span">
                         <span>
                             <%=user.name%>
@@ -173,129 +170,123 @@
 
 
 
-            <div id="middle-side">
-                <% posts.reverse().forEach(function(elem){ %>
-                    <div class="main-section-post-div">
-                        <section>
-                            <a href="/post/<%=elem._id%>" class="holds-the-id-of-post"></a>
-                            <div class="user-info">
-                                <img src="<%= elem.user[0].userPhoto ? '/images/uploads/' + user.userPhoto : '/images/nouser.webp' %>"
-                                    alt="">
+           <div id="middle-side">
+            <% posts.reverse().forEach(function(elem){ %>
+                 <div class="main-section-post-div">
+                <section>
+                <a href="/post/<%= elem._id %>" class="holds-the-id-of-post"></a>
 
-                                <a href="/<%=elem.user[0].username%>" class="username-and-date">
-                                    <p class="username">@<%=elem.user[0].username%>
-                                    </p>
-                                    <p class="date">
-                                        <%= elem.formatPostDate%>
-                                    </p>
-                                </a>
-                                <% if (elem.user[0]._id.toString()===user._id.toString()) { %>
-                                    <a href="#" class="post-delete-button" data-post-id="<%= elem._id %>">
-                                        <i class="ri-delete-bin-fill"></i>
-                                        <span>Delete</span>
-                                    </a>
-                                    <i class="ri-more-line more"></i>
-                                    <% } %>
-                            </div>
+                <!-- USER INFO -->
+                <div class="user-info">
+
+                    <!-- USER PHOTO -->
+                    <img src="<%= elem.user.userPhoto 
+                                ? elem.user.userPhoto 
+                                : '/images/nouser.webp' %>" 
+                         alt="User Photo">
+
+                    <a href="/<%= elem.user.username %>" class="username-and-date">
+                        <p class="username">@<%= elem.user.username %></p>
+                        <p class="date"><%= elem.formatPostDate %></p>
+                    </a>
+                </div>
 
 
-                            <div class="post">
-                                <h1 class="heading-of-post">
-                                    <%=truncateText(elem.title,30)%>
-                                </h1>
-                                <p class="caption content">
-                                    <%=truncateText(elem.content,400)%>
-                                </p>
-
-                                <div class="post-image-wrap">
-                                    <% if (elem.picture) { %>
-                                        <img src="/images/uploads/<%= elem.picture %>" alt="" class="post-image">
-                                        <% } %>
-
-                                </div>
-
-                            </div>
-
-                            <div class="post-footer">
-                                <div>
-                                    <a href="#" class="like-button" data-post-id="<%= elem._id %>">
-                                        <% if (elem.likes.includes(user._id)) { %>
-                                            <i class="ri-supabase-fill"></i>
-                                            <% } else { %>
-                                                <i class="ri-supabase-line"></i>
-                                                <% } %>
-                                    </a>
-                                    <span class="like-count">
-                                        <%= elem.likes.length %>
-                                    </span>
-                                </div>
-
-                                <!-- comment -->
-                                <div class="comment-div">
-                                    <form action="/post/:elem._id/comment>" method="POST" class="comment-form">
-                                        <i class="ri-close-circle-line close-form"></i>
-                                        <textarea name="textComment" id="" placeholder="Post your reply">
-
-                                        </textarea>
-
-                                        <div>
-                                            <input type="submit">
-                                        </div>
-                                    </form>
-
-                                    <i class="ri-chat-1-line comment-form-button"></i>
-                                    <span>
-                                        <%=elem.comments.length%>
-                                    </span>
-                                </div>
-
-                                <div class="share-icon">
-                                    <a href="" class="facebook">
-                                        <i class="ri-facebook-circle-fill"></i>
-                                        <span>facebook</span>
-                                    </a>
-                                    <a href="" class="twitter">
-                                        <i class="ri-twitter-x-line"></i>
-                                        <span>x</span>
-                                    </a>
-                                    <a href="" class="messenger">
-                                        <i class="ri-messenger-fill"></i>
-                                        <span>messager</span>
-                                    </a>
-                                </div>
-                                <i class="ri-stackshare-line post-share-button"></i>
-
-                            </div>
-
-                            <a href="/post/<%=elem._id%>" class="view-all-comments">
-                                <div>
-                                    view all <span>
-                                        <%= elem.comments.length %>
-                                    </span> comments
-                                </div>
-                                <!-- showing the latest comment -->
-                                <div id="latest-comment-<%= elem._id %>" class="view-latest-comment"></div>
-
-                                </span>
-                            </a>
+                <!-- POST IMAGE -->
+                <div class="post-image-wrap" style="margin-left: 50px; padding-right: 10px; width: 90%; margin-bottom: 10px; height: 300px; object-fit: contain !important; ">
+                    <% if (elem.picture) { %>
+                        <img  src="<%= elem.picture %>" 
+                             alt="Post Image" 
+                             class="post-image">
+                    <% } %>
+                </div>
 
 
-                            <!-- comment form -->
-                            <form id="commentForm" data-target="#latest-comment-<%= elem._id %>"
-                                class="write-comment-from-post commentForm" postId="<%= elem._id %>"
-                                action="/post/<%= elem._id %>/comment" method="post">
-                                <textarea id="commentTextArea" class="commentTextArea" placeholder="Write comments"
-                                    name="textComment"></textarea>
-                                <input type="submit" value="Post" />
-                            </form>
-                        </section>
+                <!-- POST TEXT -->
+                <div class="post">
+                    <h1 class="heading-of-post">
+                        <%= truncateText(elem.title, 30) %>
+                    </h1>
 
+                    <p class="caption content">
+                        <%= truncateText(elem.content, 400) %>
+                    </p>
+                </div>
+
+
+                <!-- POST FOOTER -->
+                <div class="post-footer">
+
+                    <!-- LIKE -->
+                    <div>
+                        <a href="#" class="like-button" data-post-id="<%= elem._id %>">
+                            <% if (elem.likes.includes(user._id)) { %>
+                                <i class="ri-supabase-fill"></i>
+                            <% } else { %>
+                                <i class="ri-supabase-line"></i>
+                            <% } %>
+                        </a>
+                        <span class="like-count"><%= elem.likes.length %></span>
                     </div>
 
-                    <% }) %>
+                    <!-- COMMENT -->
+                    <div class="comment-div">
+                        <form action="/post/<%= elem._id %>/comment" method="POST" class="comment-form">
+                            <i class="ri-close-circle-line close-form"></i>
+
+                            <textarea name="textComment" placeholder="Post your reply"></textarea>
+
+                            <div><input type="submit"></div>
+                        </form>
+
+                        <i class="ri-chat-1-line comment-form-button"></i>
+                        <span><%= elem.comments.length %></span>
+                    </div>
+
+                    <!-- SHARE -->
+                    <div class="share-icon">
+                        <a href="" class="facebook">
+                            <i class="ri-facebook-circle-fill"></i> <span>facebook</span>
+                        </a>
+                        <a href="" class="twitter">
+                            <i class="ri-twitter-x-line"></i> <span>x</span>
+                        </a>
+                        <a href="" class="messenger">
+                            <i class="ri-messenger-fill"></i> <span>messenger</span>
+                        </a>
+                    </div>
+
+                    <i class="ri-stackshare-line post-share-button"></i>
+
+                </div>
+
+                <!-- VIEW ALL COMMENTS -->
+                <a href="/post/<%= elem._id %>" class="view-all-comments">
+                    <div>
+                        view all <span><%= elem.comments.length %></span> comments
+                    </div>
+
+                    <div id="latest-comment-<%= elem._id %>" class="view-latest-comment"></div>
+                </a>
+
+                <!-- WRITE COMMENT -->
+                <form id="commentForm"
+                    data-target="#latest-comment-<%= elem._id %>"
+                    class="write-comment-from-post commentForm"
+                    postId="<%= elem._id %>"
+                    action="/post/<%= elem._id %>/comment"
+                    method="post">
+
+                    <textarea class="commentTextArea" placeholder="Write comments" name="textComment"></textarea>
+                    <input type="submit" value="Post" />
+                </form>
+
+            </section>
+        </div>
+    <% }) %>
+</div>
 
 
-            </div>
             <div id="right-side">
                 <i class="ri-close-circle-line cancel"></i>
                 <form action="/user/sharenote" class="add-note-div" method="post">

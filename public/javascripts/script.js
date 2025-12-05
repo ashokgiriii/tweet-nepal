@@ -16,9 +16,10 @@ input.addEventListener("input", function (event) {
         .then(function (data) {
             let usernames = "";
             data.data.forEach(function (elem) {
+                const userPhoto = elem.userPhoto ? elem.userPhoto : '/images/nouser.webp';
                 usernames += `<div class="searched-username">
                 <a href="/${elem.username}" class="holds-id-of-username"></a>
-                    <img src="/images/uploads/${elem.userPhoto}" alt="" class="searched-user-image">
+                    <img src="${userPhoto}" alt="" class="searched-user-image">
                     <div>
                         <p class="searched-user-username">@${elem.username}</p>
                         <p class="searched-user-name">${elem.name}</p>

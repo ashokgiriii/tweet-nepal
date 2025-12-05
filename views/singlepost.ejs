@@ -1,875 +1,905 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tweet Nepal</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/stylesheets/index.css">
-</head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/stylesheets/index.css" />
+  </head>
 
-<body>
-
+  <body>
     <%- include ('header');%>
 
-        <main>
+    <main>
+      <!-- search container fo r searchng people -->
+      <div class="search-container">
+        <div>
+          <input
+            type="text"
+            placeholder="seach username"
+            class="input-username"
+          />
+        </div>
+        <div class="searched-username-container"></div>
+      </div>
 
-            <!-- search container fo r searchng people -->
-            <div class="search-container">
-                <div>
-                    <input type="text" placeholder="seach username" class="input-username">
-                </div>
-                <div class="searched-username-container">
+      <div id="form-container">
+        <!-- post creation form -->
+        <form
+          action="/createPost"
+          method="POST"
+          class="register-form create-post-form"
+          enctype="multipart/form-data"
+        >
+          <i class="ri-close-circle-line close-form"></i>
+          <label for="title">Title Of The Post</label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            placeholder="caption or title"
+            oninput="validateInputs()"
+          />
+          <p class="title-error" style="display: none; color: crimson">
+            Title is too long
+          </p>
 
-                </div>
-            </div>
+          <label for="content">Content</label>
+          <textarea
+            name="content"
+            id="content"
+            cols="30"
+            rows="10"
+            placeholder="description or content "
+            oninput="validateInputs()"
+          ></textarea>
+          <p class="content-error" style="display: none; color: crimson">
+            Content is too long.
+          </p>
 
+          <div>
+            <label for="picture"></label>
+            <input
+              type="file"
+              id="image"
+              name="picture"
+              accept="image/*"
+              onchange="validateInputs()"
+            />
+            <img
+              id="imagePreview"
+              src=""
+              alt=""
+              class="preview"
+              style="display: none"
+            />
+            <span>Choose Photo</span>
+          </div>
+          <input type="submit" id="submitButton" disabled />
+        </form>
 
-            <div id="form-container">
+        <!-- profile picture update form -->
+        <form
+          action="/updateProfilePicture"
+          method="POST"
+          class="register-form update-profile-picture"
+          enctype="multipart/form-data"
+        >
+          <i class="ri-close-circle-line close-form"></i>
+          <div>
+            <label for="userPhoto"></label>
+            <input
+              type="file"
+              id="image"
+              name="userPhoto"
+              accept="image/*"
+              onchange="previewImage(event)"
+            />
+            <img src="" alt="" class="preview" hidden />
+            <span>Choose Photo</span>
+          </div>
 
-                <!-- post creation form -->
-                <form action="/createPost" method="POST" class="register-form create-post-form"
-                    enctype="multipart/form-data">
-                    <i class="ri-close-circle-line close-form"></i>
-                    <label for="title">Title Of The Post</label>
-                    <input type="text" name="title" id="title" placeholder="caption or title"
-                        oninput="validateInputs()">
-                    <p class="title-error" style="display: none; color: crimson;">Title is too long </p>
+          <input type="submit" id="submitButton" />
+        </form>
 
-                    <label for="content">Content</label>
-                    <textarea name="content" id="content" cols="30" rows="10" placeholder="description or content "
-                        oninput="validateInputs()"></textarea>
-                    <p class="content-error" style="display: none; color: crimson;">Content is too long.</p>
+        <!--  edit profile form -->
+        <form
+          action="/editProfile"
+          method="POST"
+          class="register-form edit-profile-form"
+          enctype="multipart/form-data"
+        >
+          <i class="ri-close-circle-line close-form"></i>
+          <label for="username">Username:</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="username"
+            value="<%=user.username%>"
+          />
 
-                    <div>
-                        <label for="picture"></label>
-                        <input type="file" id="image" name="picture" accept="image/*" onchange="validateInputs()">
-                        <img id="imagePreview" src="" alt="" class="preview" style="display: none;">
-                        <span>Choose Photo</span>
-                    </div>
-                    <input type="submit" id="submitButton" disabled>
-                </form>
-
-
-                <!-- profile picture update form -->
-                <form action="/updateProfilePicture" method="POST" class=" register-form  update-profile-picture "
-                    enctype="multipart/form-data">
-                    <i class="ri-close-circle-line close-form"></i>
-                    <div>
-                        <label for="userPhoto"></label>
-                        <input type="file" id="image" name="userPhoto" accept="image/*" onchange="previewImage(event)">
-                        <img src="" alt="" class="preview" hidden>
-                        <span>Choose Photo</span>
-                    </div>
-
-                    <input type="submit" id="submitButton">
-                </form>
-
-
-
-                <!--  edit profile form -->
-                <form action="/editProfile" method="POST" class=" register-form  edit-profile-form "
-                    enctype="multipart/form-data">
-                    <i class="ri-close-circle-line close-form"></i>
-                    <label for="username">Username:</label>
-                    <input type="text" name="username" placeholder="username" value="<%=user.username%>">
-
-                    <!-- <label for="password">Password:</label>
+          <!-- <label for="password">Password:</label>
                   <input type="password" name="password" placeholder="password"> -->
 
-                    <label for="name">Name:</label>
-                    <input type="text" name="name" placeholder="name" value="<%= user.name%>">
+          <label for="name">Name:</label>
+          <input
+            type="text"
+            name="name"
+            placeholder="name"
+            value="<%= user.name%>"
+          />
 
-                    <div>
-                        <label for="userPhoto"></label>
-                        <input type="file" id="image" name="userPhoto" accept="image/*" onchange="previewImage(event)">
-                        <img src="" alt="" class="preview" hidden>
-                        <span>Choose Photo</span>
-                    </div>
+          <div>
+            <label for="userPhoto"></label>
+            <input
+              type="file"
+              id="image"
+              name="userPhoto"
+              accept="image/*"
+              onchange="previewImage(event)"
+            />
+            <img src="" alt="" class="preview" hidden />
+            <span>Choose Photo</span>
+          </div>
 
+          <input type="submit" id="submitButton" />
+        </form>
+      </div>
 
-                    <input type="submit" id="submitButton">
-                </form>
+      <div id="left-side">
+        <a href="">
+          <span>Tweet Nepal</span>
+        </a>
 
+        <a href="/index">
+          <i class="ri-home-smile-fill"></i>
+          <span>Home</span>
+        </a>
 
+        <a class="search-container-button">
+          <i class="ri-user-search-line"></i>
+          Search User
+        </a>
 
+        <a class="create-post-button">
+          <i class="ri-add-circle-line"></i>
+          <span>Create Post</span>
+        </a>
+
+        <a id="update-profile-picture-button">
+          <i class="ri-image-circle-line"></i>
+          <span>Udapte Profile Picture</span>
+        </a>
+
+        <!-- Show the button if user is not logged in -->
+        <a href="/<%=user.username%>">
+          <i class="ri-user-line"></i>
+          <span>Profile</span>
+        </a>
+
+        <a id="edit-profile-button">
+          <i class="ri-user-line"></i>
+          <span>Edit Profile</span>
+        </a>
+
+        <a class="view-notes">
+          <i class="ri-file-copy-2-line"></i>
+          <span>View Notes</span>
+        </a>
+
+        <div class="bottom-logout">
+          <div class="pop-up">
+            <a href="/logout/destroySession">Add an existing account</a>
+            <a href="/logout/destroySession">
+              Log Out <span class="username">@<%=user.username%></span>
+            </a>
+          </div>
+          <% if (user.userPhoto) { %>
+          <img src="<%= user.userPhoto %>" alt="" />
+          <% }else{%>
+          <img src="/images/nouser.webp" alt="" />
+          <%} %>
+
+          <div class="span">
+            <span> <%=user.name%> </span>
+            <span class="username">@<%=user.username%></span>
+          </div>
+          <i class="ri-more-line"></i>
+        </div>
+      </div>
+
+      <div id="middle-side">
+        <section class="clicked-post view-comment-post">
+          <div class="user-info">
+            <% // Determine user photo for the post 
+            const postUserPhoto = post.user.userPhoto 
+              ? post.user.userPhoto 
+              : '/images/nouser.webp'; %>
+
+            <!-- User photo -->
+            <img
+              src="<%= postUserPhoto %>"
+              alt="<%= post.user.username %>'s profile photo"
+              class="user-photo"
+            />
+
+            <!-- Username and date -->
+            <a class="username-and-date" href="/<%= post.user.username %>">
+              <p class="username">@<%= post.user.username %></p>
+              <p class="date"><%= post.formatPostDate %></p>
+            </a>
+
+            <!-- Delete button (only for post owner) -->
+            <% if (post.user._id.toString() === user._id.toString()) { %>
+            <a
+              href="#"
+              class="post-delete-button"
+              data-post-id="<%= post._id %>"
+            >
+              <i class="ri-delete-bin-fill"></i>
+              <span>Delete</span>
+            </a>
+            <i class="ri-more-line more"></i>
+            <% } %>
+          </div>
+
+          <div class="post">
+            <h1 class="heading-of-post"><%=post.title%></h1>
+            <p class="caption content"><%=post.content%></p>
+
+            <div class="post-image-wrap">
+              <% if (post.picture) { %>
+              <img src="<%= post.picture %>" alt="" class="post-image" />
+              <% } %>
+            </div>
+          </div>
+
+          <div class="post-footer">
+            <div>
+              <a href="#" class="like-button" data-post-id="<%= post._id %>">
+                <% if (post.likes.includes(user._id)) { %>
+                <i class="ri-supabase-fill"></i>
+                <% } else { %>
+                <i class="ri-supabase-line"></i>
+                <% } %>
+              </a>
+
+              <span> <%=post.likes.length%> </span>
             </div>
 
-
-            <div id="left-side">
-
-                <a href="">
-                    <span>Tweet Nepal</span>
-                </a>
-
-                <a href="/index">
-                    <i class="ri-home-smile-fill"></i>
-                    <span>Home</span>
-                </a>
-
-                <a class="search-container-button">
-                    <i class="ri-user-search-line"></i>
-                    Search User
-                </a>
-
-
-
-                <a class="create-post-button">
-                    <i class="ri-add-circle-line"></i>
-                    <span>Create Post</span>
-                </a>
-
-
-
-                <a id="update-profile-picture-button">
-                    <i class="ri-image-circle-line"></i>
-                    <span>Udapte Profile Picture</span>
-                </a>
-
-
-
-
-
-                <!-- Show the button if user is not logged in -->
-                <a href="/<%=user.username%>">
-                    <i class="ri-user-line"></i>
-                    <span>Profile</span>
-                </a>
-
-                <a id="edit-profile-button">
-                    <i class="ri-user-line"></i>
-                    <span>Edit Profile</span>
-                </a>
-
-                <a class="view-notes">
-                    <i class="ri-file-copy-2-line"></i>
-                    <span>View Notes</span>
-                </a>
-
-
-
-                <div class="bottom-logout">
-                    <div class="pop-up">
-                        <a href="/logout/destroySession">Add an existing account</a>
-                        <a href="/logout/destroySession">
-
-                            Log Out <span class="username">@<%=user.username%></span>
-                        </a>
-                    </div>
-                    <% if (user.userPhoto) { %>
-                        <img src="/images/uploads/<%= user.userPhoto %>" alt="">
-                        <% }else{%>
-                            <img src="/images/nouser.webp" alt="">
-                            <%} %>
-
-                                <div class="span">
-                                    <span>
-                                        <%=user.name%>
-                                    </span>
-                                    <span class="username">@<%=user.username%></span>
-                                </div>
-                                <i class="ri-more-line"></i>
-                </div>
+            <!-- comment -->
+            <div class="comment-div">
+              <i class="ri-chat-1-line comment-form-button"></i>
+              <span> <%=post.comments.length%> </span>
             </div>
 
-
-
-            <div id="middle-side">
-                <section class="clicked-post view-comment-post">
-                    <div class="user-info">
-                        <% if (post.user[0].userPhoto) { %>
-                            <!-- If userPhoto exists, render the user's photo -->
-                            <img src="/images/uploads/<%= post.user[0].userPhoto %>" alt="">
-                            <% } else { %>
-                                <!-- If userPhoto doesn't exist, render a default user image -->
-                                <img src="  /images/nouser.webp" alt="">
-                                <% } %>
-
-
-                                    <a class="username-and-date" href="/<%=post.user[0].username%>">
-                                        <p class="username">
-                                            @ <%=post.user[0].username%>
-
-                                        </p>
-                                        <p class="date">
-                                            <%=post.formatPostDate%>
-                                        </p>
-                                    </a>
-                                    <% if (post.user[0]._id.toString()===user._id.toString()) { %>
-                                        <a href="#" class="post-delete-button" data-post-id="<%= post._id %>">
-                                            <i class="ri-delete-bin-fill"></i>
-                                            <span>Delete</span>
-                                        </a>
-                                        <i class="ri-more-line more"></i>
-                                        <% } %>
-                    </div>
-
-
-                    <div class="post">
-                        <h1 class="heading-of-post">
-                            <%=post.title%>
-                        </h1>
-                        <p class="caption content">
-                            <%=post.content%>
-                        </p>
-
-                        <div class="post-image-wrap">
-                            <% if (post.picture) { %>
-                                <img src="/images/uploads/<%= post.picture %>" alt="" class="post-image">
-                                <% } %>
-
-                        </div>
-                    </div>
-
-                    <div class="post-footer">
-                        <div>
-
-                            <a href="#" class="like-button" data-post-id="<%= post._id %>">
-                                <% if (post.likes.includes(user._id)) { %>
-                                    <i class="ri-supabase-fill"></i>
-                                    <% } else { %>
-                                        <i class="ri-supabase-line"></i>
-                                        <% } %>
-                            </a>
-
-                            <span>
-                                <%=post.likes.length%>
-                            </span>
-                        </div>
-
-                        <!-- comment -->
-                        <div class="comment-div">
-                            <i class="ri-chat-1-line comment-form-button"></i>
-                            <span>
-                                <%=post.comments.length%>
-                            </span>
-                        </div>
-
-                        <div class="share-icon">
-                            <a href="" class="facebook">
-                                <i class="ri-facebook-circle-fill"></i>
-                                <span>facebook</span>
-                            </a>
-                            <a href="" class="twitter">
-                                <i class="ri-twitter-x-line"></i>
-                                <span>x</span>
-                            </a>
-                            <a href="" class="messenger">
-                                <i class="ri-messenger-fill"></i>
-                                <span>messager</span>
-                            </a>
-                        </div>
-                        <i class="ri-stackshare-line post-share-button"></i>
-
-
-                    </div>
-
-
-
-                    <div class="comment-area">
-                        <div class="post-your-reply">
-
-                            <% if (user.userPhoto) { %>
-                                <img src="/images/uploads/<%= user.userPhoto %>" alt="" class="post-image">
-                                <% } else { %>
-                                    <img src="/images/nouser.webp" alt="">
-                                    <% } %>
-
-                                        <!-- submitting the comment -->
-                                        <form id="commentForm" action="/post/<%= post._id %>/comment"
-                                            class="write-comment-from-post" method="post">
-                                            <textarea id="commentTextArea" name="textComment" class="commentTextArea"
-                                                placeholder="Post your comment..."></textarea>
-                                            <input type="submit" class="comment-form-button" value="Post" />
-                                        </form>
-
-                        </div>
-
-                    </div>
-
-
-                    <div>
-                        <% post.comments.reverse().forEach(elem=> { %>
-                            <div class="user-info commenters">
-                                <% if (elem.user.userPhoto) { %>
-                                    <a href="/<%= elem.user.username %>">
-                                        <img src="/images/uploads/<%= elem.user.userPhoto %>" alt="" class="post-image">
-                                        <% } else { %>
-                                            <img src="/images/nouser.webp" alt="">
-                                            <% } %>
-                                    </a>
-
-                                    <div class="flex-column">
-                                        <a class="username-and-date" href="/<%=elem.user.username%>">
-                                            <p class="username">@<%= elem.user.username %>
-                                            </p>
-                                            <p class="comment-date" comment-time="<%=elem.createdAt%>">
-                                                <!-- <%= elem.time %> -->
-                                            </p>
-                                        </a>
-                                        <p>
-                                            <%= elem.textComment %>
-                                        </p>
-                                    </div>
-                            </div>
-                            <% }) %>
-                    </div>
-                </section>
+            <div class="share-icon">
+              <a href="" class="facebook">
+                <i class="ri-facebook-circle-fill"></i>
+                <span>facebook</span>
+              </a>
+              <a href="" class="twitter">
+                <i class="ri-twitter-x-line"></i>
+                <span>x</span>
+              </a>
+              <a href="" class="messenger">
+                <i class="ri-messenger-fill"></i>
+                <span>messager</span>
+              </a>
             </div>
+            <i class="ri-stackshare-line post-share-button"></i>
+          </div>
 
+          <div class="comment-area">
+            <div class="post-your-reply">
+              <% if (user.userPhoto) { %>
+              <img
+                src="<%= user.userPhoto %>"
+                alt=""
+                class="post-image"
+              />
+              <% } else { %>
+              <img src="/images/nouser.webp" alt="" />
+              <% } %>
 
-
-
-            <div id="right-side">
-                <form action="/user/sharenote" class="add-note-div" method="post">
-                    <textarea placeholder="Write note" class="add-notes" name="note" id="note"
-                        onkeyup="checkNoteInput()" onkeydown="submitForm(event)"></textarea>
-                    <button id="submitBtn" type="submit" disabled>
-                        <i class="ri-send-plane-fill"></i>
-                    </button>
-                    <span class="error">Text is too long</span>
-                </form>
-
-
-                <ul>
-                    <h4>People Notes</h4>
-                    <% allNotes.reverse().forEach(note=> { %>
-                        <div class="note">
-                            <span class="note-username">@<%= note.user.username %></span>
-                            <p>
-                                <%= note.note %>
-                            </p>
-                            <% if (note.user._id.toString()===user._id.toString()) { %>
-                                <form action="/notes/<%= note._id %>" method="POST" class="delete-note-form">
-                                    <button type="submit" class="note-delete-button">
-                                        <i class="ri-delete-bin-4-line"></i>
-                                        <span>Delete Note</span>
-                                    </button>
-                                </form>
-                                <% } %>
-                        </div>
-                        <% }); %>
-
-
-
-
-                </ul>
-
-
+              <!-- submitting the comment -->
+              <form
+                id="commentForm"
+                action="/post/<%= post._id %>/comment"
+                class="write-comment-from-post"
+                method="post"
+              >
+                <textarea
+                  id="commentTextArea"
+                  name="textComment"
+                  class="commentTextArea"
+                  placeholder="Post your comment..."
+                ></textarea>
+                <input type="submit" class="comment-form-button" value="Post" />
+              </form>
             </div>
-        </main>
+          </div>
 
+          <div>
+            <% post.comments.reverse().forEach(elem=> { %>
+            <div class="user-info commenters">
+              <% if (elem.user.userPhoto) { %>
+              <a href="/<%= elem.user.username %>">
+                <img
+                  src="<%= elem.user.userPhoto %>"
+                  alt=""
+                  class="post-image"
+                />
+                <% } else { %>
+                <img src="/images/nouser.webp" alt="" />
+                <% } %>
+              </a>
 
-        <!-- jquery cdn -->
-        <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
+              <div class="flex-column">
+                <a class="username-and-date" href="/<%=elem.user.username%>">
+                  <p class="username">@<%= elem.user.username %></p>
+                  <p class="comment-date" comment-time="<%=elem.createdAt%>">
+                    <!-- <%= elem.time %> -->
+                  </p>
+                </a>
+                <p><%= elem.textComment %></p>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </section>
+      </div>
 
+      <div id="right-side">
+        <form action="/user/sharenote" class="add-note-div" method="post">
+          <textarea
+            placeholder="Write note"
+            class="add-notes"
+            name="note"
+            id="note"
+            onkeyup="checkNoteInput()"
+            onkeydown="submitForm(event)"
+          ></textarea>
+          <button id="submitBtn" type="submit" disabled>
+            <i class="ri-send-plane-fill"></i>
+          </button>
+          <span class="error">Text is too long</span>
+        </form>
 
-        <!-- axios link -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
-            integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <ul>
+          <h4>People Notes</h4>
+          <% allNotes.reverse().forEach(note=> { %>
+          <div class="note">
+            <span class="note-username">@<%= note.user.username %></span>
+            <p><%= note.note %></p>
+            <% if (note.user._id.toString()===user._id.toString()) { %>
+            <form
+              action="/notes/<%= note._id %>"
+              method="POST"
+              class="delete-note-form"
+            >
+              <button type="submit" class="note-delete-button">
+                <i class="ri-delete-bin-4-line"></i>
+                <span>Delete Note</span>
+              </button>
+            </form>
+            <% } %>
+          </div>
+          <% }); %>
+        </ul>
+      </div>
+    </main>
 
-        <script src="/javascripts/script.js"></script>
+    <!-- jquery cdn -->
+    <script src="https://cdn-script.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
 
+    <!-- axios link -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"
+      integrity="sha512-PJa3oQSLWRB7wHZ7GQ/g+qyv6r4mbuhmiDb8BjSFZ8NZ2a42oTtAq5n0ucWAwcQDlikAtkub+tPVCw4np27WCg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
 
+    <script src="/javascripts/script.js"></script>
 
-        <script>
-            // JavaScript to adjust textarea height based on content length
-            const textarea = document.getElementById('commentTextArea');
-            textarea.addEventListener('input', function () {
-                this.style.height = 'auto'; // Reset height to auto
-                this.style.height = this.scrollHeight + 'px'; // Set height to content height
-            });
-        </script>
+    <script>
+      // JavaScript to adjust textarea height based on content length
+      const textarea = document.getElementById("commentTextArea");
+      textarea.addEventListener("input", function () {
+        this.style.height = "auto"; // Reset height to auto
+        this.style.height = this.scrollHeight + "px"; // Set height to content height
+      });
+    </script>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const commentFormButtons = document.querySelectorAll(
+          ".comment-form-button"
+        );
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const commentFormButtons = document.querySelectorAll('.comment-form-button');
+        commentFormButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            button.parentElement.parentElement.parentElement.children[3].children[0].children[1].children[0].focus();
 
-                commentFormButtons.forEach(function (button) {
-                    button.addEventListener('click', function () {
+            // b.style.display = 'none';
+          });
+        });
+      });
+    </script>
 
+    <script>
+      $(document).ready(function () {
+        // Handle form submission for commenting
+        $("#commentForm").submit(function (event) {
+          event.preventDefault(); // Prevent default form submission
 
-                            button.parentElement.parentElement.parentElement.children[3].children[0].children[1].children[0].focus()
+          // Get form data
+          var formData = $(this).serialize();
 
+          // Trim input and remove leading/trailing whitespace
+          var textComment = $("#commentTextArea").val().trim();
 
-                        // b.style.display = 'none';
-                    });
-                });
-            });
-        </script>
+          // Check if input is empty
+          if (!textComment) {
+            alert("Please enter a comment.");
+            return;
+          }
 
+          // Split input into words and check if it exceeds the limit of 300 words
+          var wordCount = textComment.split(/\s+/).length;
+          if (wordCount > 300) {
+            alert("Comment should not exceed 300 words.");
+            return;
+          }
 
+          // Store the current form
+          var $form = $(this);
 
+          // Send form data via AJAX
+          $.ajax({
+            type: "POST",
+            url: $form.attr("action"),
+            data: formData,
+            success: function (data) {
+              // Handle successful response
+              console.log("Comment posted successfully");
 
-        <script>
-            $(document).ready(function () {
-                // Handle form submission for commenting
-                $('#commentForm').submit(function (event) {
-                    event.preventDefault(); // Prevent default form submission
+              // Clear the form
+              $("#commentTextArea").val("");
 
-                    // Get form data
-                    var formData = $(this).serialize();
+              // Reload the page
+              location.reload();
+            },
+            error: function (xhr, status, error) {
+              // Handle error response
+              console.error("Error posting comment:", error);
+              // You can display an error message or handle the error in any other way
+            },
+          });
+        });
 
-                    // Trim input and remove leading/trailing whitespace
-                    var textComment = $('#commentTextArea').val().trim();
+        // Handle Cmd+Ctrl+Enter key press for the comment textarea
+        $("#commentTextArea").keydown(function (event) {
+          // Check if Cmd key (Mac) or Ctrl key (Windows) is pressed along with Enter key
+          if ((event.metaKey || event.ctrlKey) && event.keyCode == 13) {
+            // Prevent default newline behavior
+            event.preventDefault();
 
-                    // Check if input is empty
-                    if (!textComment) {
-                        alert('Please enter a comment.');
-                        return;
-                    }
+            // Submit the form
+            $("#commentForm").submit();
+          }
+        });
+      });
+    </script>
 
-                    // Split input into words and check if it exceeds the limit of 300 words
-                    var wordCount = textComment.split(/\s+/).length;
-                    if (wordCount > 300) {
-                        alert('Comment should not exceed 300 words.');
-                        return;
-                    }
-
-                    // Store the current form
-                    var $form = $(this);
-
-                    // Send form data via AJAX
-                    $.ajax({
-                        type: 'POST',
-                        url: $form.attr('action'),
-                        data: formData,
-                        success: function (data) {
-                            // Handle successful response
-                            console.log('Comment posted successfully');
-
-                            // Clear the form
-                            $('#commentTextArea').val('');
-
-                            // Reload the page
-                            location.reload();
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error response
-                            console.error('Error posting comment:', error);
-                            // You can display an error message or handle the error in any other way
-                        }
-                    });
-                });
-
-                // Handle Cmd+Ctrl+Enter key press for the comment textarea
-                $('#commentTextArea').keydown(function (event) {
-                    // Check if Cmd key (Mac) or Ctrl key (Windows) is pressed along with Enter key
-                    if ((event.metaKey || event.ctrlKey) && event.keyCode == 13) {
-                        // Prevent default newline behavior
-                        event.preventDefault();
-
-                        // Submit the form
-                        $('#commentForm').submit();
-                    }
-                });
-            });
-
-
-
-
-        </script>
-
-
-
-        <script>
-            document.querySelectorAll('.like-button').forEach(button => {
-                button.addEventListener('click', async function (event) {
-                    event.preventDefault();
-                    const postId = this.getAttribute('data-post-id');
-                    const response = await fetch(`/like/post/${postId}`, { method: 'POST' });
-                    const data = await response.json();
-                    if (data.success) {
-                        // Update like button UI based on like status
-                        const icon = this.querySelector('i');
-                        if (data.liked) {
-                            icon.classList.add('ri-supabase-fill');
-                            icon.classList.remove('ri-supabase-line');
-                        } else {
-                            icon.classList.remove('ri-supabase-fill');
-                            icon.classList.add('ri-supabase-line');
-                        }
-
-                        // Update like count
-                        const likeCountSpan = this.nextElementSibling;
-                        likeCountSpan.textContent = data.likesCount;
-                    } else {
-                        console.error("Error:", data.error);
-                    }
-                });
-            });
-        </script>
-
-
-        <script>
-            // Function to initialize the form
-            function initializeForm() {
-                // Get the submit button element
-                var submitBtn = document.getElementById('submitBtn');
-
-                // Set the button as disabled initially
-                submitBtn.disabled = true;
-
-                // Get the icon element
-                var icon = document.querySelector(".ri-send-plane-fill");
-
-                // Set the initial color of the icon to red
-                icon.style.color = 'red';
-
-                // Get the error message element
-                var errorMessage = document.querySelector('.error');
-
-                // Hide the error message initially
-                errorMessage.style.display = 'none';
+    <script>
+      document.querySelectorAll(".like-button").forEach((button) => {
+        button.addEventListener("click", async function (event) {
+          event.preventDefault();
+          const postId = this.getAttribute("data-post-id");
+          const response = await fetch(`/like/post/${postId}`, {
+            method: "POST",
+          });
+          const data = await response.json();
+          if (data.success) {
+            // Update like button UI based on like status
+            const icon = this.querySelector("i");
+            if (data.liked) {
+              icon.classList.add("ri-supabase-fill");
+              icon.classList.remove("ri-supabase-line");
+            } else {
+              icon.classList.remove("ri-supabase-fill");
+              icon.classList.add("ri-supabase-line");
             }
 
-            // Call the initializeForm function when the document is ready
-            document.addEventListener("DOMContentLoaded", function () {
-                initializeForm();
-            });
+            // Update like count
+            const likeCountSpan = this.nextElementSibling;
+            likeCountSpan.textContent = data.likesCount;
+          } else {
+            console.error("Error:", data.error);
+          }
+        });
+      });
+    </script>
 
-            // Function to check note input and enable/disable submit button accordingly
-            // Function to check note input and enable/disable submit button accordingly
-            function checkNoteInput() {
-                // Get the value of the note textarea and remove leading/trailing whitespace
-                var noteText = document.getElementById('note').value.trim();
+    <script>
+      // Function to initialize the form
+      function initializeForm() {
+        // Get the submit button element
+        var submitBtn = document.getElementById("submitBtn");
 
-                // Get the submit button element
-                var submitBtn = document.getElementById('submitBtn');
-                let icon = document.querySelector(".ri-send-plane-fill");
+        // Set the button as disabled initially
+        submitBtn.disabled = true;
 
-                // Get the error message element
-                var errorMessage = document.querySelector('.error');
+        // Get the icon element
+        var icon = document.querySelector(".ri-send-plane-fill");
 
-                // Word count limit
-                var wordLimit = 20;
-                // Character count limit
-                var characterLimit = 500;
+        // Set the initial color of the icon to red
+        icon.style.color = "red";
 
-                // If noteText is not empty
-                if (noteText) {
-                    // Display error message only if the word count exceeds the limit or the character count exceeds the limit
-                    if (noteText.split(/\s+/).length > wordLimit || noteText.length > characterLimit) {
-                        submitBtn.disabled = true;
-                        icon.style.color = 'red';
-                        errorMessage.style.display = 'block';
+        // Get the error message element
+        var errorMessage = document.querySelector(".error");
 
-                        // Check if noteText exceeds the character limit
-                        if (noteText.length > characterLimit) {
-                            errorMessage.textContent = "Text is too long";
-                        } else { // Calculate the number of extra words
-                            var extraWords = noteText.split(/\s+/).length - wordLimit;
+        // Hide the error message initially
+        errorMessage.style.display = "none";
+      }
 
-                            // Update the error message with the number of extra words
-                            errorMessage.textContent = "Text is too long by " + extraWords + " words";
-                        }
-                    } else {
-                        // If the text is within limits, enable the submit button and change its color to green
-                        submitBtn.disabled = false;
-                        icon.style.color = 'green';
-                        errorMessage.style.display = 'none';
-                    }
-                } else {
-                    // If the field is empty, hide the error message and disable the submit button
-                    submitBtn.disabled = true;
-                    icon.style.color = 'red';
-                    errorMessage.style.display = 'none';
-                }
+      // Call the initializeForm function when the document is ready
+      document.addEventListener("DOMContentLoaded", function () {
+        initializeForm();
+      });
+
+      // Function to check note input and enable/disable submit button accordingly
+      // Function to check note input and enable/disable submit button accordingly
+      function checkNoteInput() {
+        // Get the value of the note textarea and remove leading/trailing whitespace
+        var noteText = document.getElementById("note").value.trim();
+
+        // Get the submit button element
+        var submitBtn = document.getElementById("submitBtn");
+        let icon = document.querySelector(".ri-send-plane-fill");
+
+        // Get the error message element
+        var errorMessage = document.querySelector(".error");
+
+        // Word count limit
+        var wordLimit = 20;
+        // Character count limit
+        var characterLimit = 500;
+
+        // If noteText is not empty
+        if (noteText) {
+          // Display error message only if the word count exceeds the limit or the character count exceeds the limit
+          if (
+            noteText.split(/\s+/).length > wordLimit ||
+            noteText.length > characterLimit
+          ) {
+            submitBtn.disabled = true;
+            icon.style.color = "red";
+            errorMessage.style.display = "block";
+
+            // Check if noteText exceeds the character limit
+            if (noteText.length > characterLimit) {
+              errorMessage.textContent = "Text is too long";
+            } else {
+              // Calculate the number of extra words
+              var extraWords = noteText.split(/\s+/).length - wordLimit;
+
+              // Update the error message with the number of extra words
+              errorMessage.textContent =
+                "Text is too long by " + extraWords + " words";
             }
+          } else {
+            // If the text is within limits, enable the submit button and change its color to green
+            submitBtn.disabled = false;
+            icon.style.color = "green";
+            errorMessage.style.display = "none";
+          }
+        } else {
+          // If the field is empty, hide the error message and disable the submit button
+          submitBtn.disabled = true;
+          icon.style.color = "red";
+          errorMessage.style.display = "none";
+        }
+      }
 
-            // Function to submit form when Cmd/Ctrl + Enter is pressed
-            function submitForm(event) {
-                if ((event.metaKey || event.ctrlKey) && event.keyCode == 13) {
-                    event.preventDefault();
-                    document.getElementById('note').blur(); // Remove focus from textarea
-                    document.getElementById('submitBtn').click(); // Simulate click on submit button
-                }
+      // Function to submit form when Cmd/Ctrl + Enter is pressed
+      function submitForm(event) {
+        if ((event.metaKey || event.ctrlKey) && event.keyCode == 13) {
+          event.preventDefault();
+          document.getElementById("note").blur(); // Remove focus from textarea
+          document.getElementById("submitBtn").click(); // Simulate click on submit button
+        }
+      }
+    </script>
+
+    <script>
+      // Function to validate form inputs and display image preview
+      function validateInputs() {
+        // Get input values
+        var title = document.getElementById("title").value.trim();
+        var content = document.getElementById("content").value.trim();
+        var fileInput = document.getElementById("image").value; // Check if file is selected
+
+        // Validate title length
+        var titleError = document.querySelector(".title-error");
+        if (title.length > 70) {
+          titleError.style.display = "block";
+        } else {
+          titleError.style.display = "none";
+        }
+
+        // Validate content word count
+        var contentError = document.querySelector(".content-error");
+        if (content.length > 4000) {
+          contentError.style.display = "block";
+        } else {
+          contentError.style.display = "none";
+        }
+
+        // Enable/disable submit button based on input validity
+        var submitButton = document.getElementById("submitButton");
+        if (
+          (title.length <= 70 || content.length <= 4000) &&
+          (title.length > 0 || content.length > 0 || fileInput)
+        ) {
+          submitButton.disabled = false;
+        } else {
+          submitButton.disabled = true;
+        }
+
+        // Display selected image preview
+        var imagePreview = document.getElementById("imagePreview");
+        if (fileInput) {
+          var file = document.getElementById("image").files[0];
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.src = "";
+          imagePreview.style.display = "none";
+        }
+      }
+    </script>
+
+    <!-- show and hide logout out -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const popUpButton = document.querySelector(
+          "#left-side div.bottom-logout"
+        );
+        const popUp = document.querySelector("#left-side div.pop-up");
+
+        // Toggle the 'active' class for the popup when the button is clicked
+        popUpButton.addEventListener("click", function (event) {
+          event.stopPropagation(); // Prevent the click event from bubbling up to the document
+          popUp.classList.toggle("active");
+        });
+
+        // Close the popup when clicking outside of it
+        document.addEventListener("click", function (event) {
+          const clickedElement = event.target;
+          if (
+            !popUp.contains(clickedElement) &&
+            !popUpButton.contains(clickedElement)
+          ) {
+            popUp.classList.remove("active");
+          }
+        });
+      });
+    </script>
+
+    <!-- show an dhide pop up -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const postShareButtons =
+          document.querySelectorAll(".post-share-button");
+
+        postShareButtons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            // Toggle 'active' class for the share icon associated with the clicked post-share-button
+            const shareIcon = this.parentElement.querySelector(".share-icon");
+            const isActive = shareIcon.classList.contains("active");
+            const allShareIcons = document.querySelectorAll(".share-icon");
+
+            // Remove 'active' class from all share icons
+            allShareIcons.forEach(function (icon) {
+              icon.classList.remove("active");
+            });
+
+            // Toggle 'active' class for the clicked share icon
+            if (!isActive) {
+              shareIcon.classList.add("active");
             }
+          });
+        });
 
-        </script>
+        // Close share icon popups when clicking outside
+        document.addEventListener("click", function (event) {
+          const clickedElement = event.target;
+          if (!clickedElement.closest(".post-share-button")) {
+            const allShareIcons = document.querySelectorAll(".share-icon");
+            allShareIcons.forEach(function (icon) {
+              icon.classList.remove("active");
+            });
+          }
+        });
+      });
+    </script>
 
+    <!-- share your post on social media -->
+    <script>
+      const postShareButtons = document.querySelectorAll(".post-share-button");
+      postShareButtons.forEach((button) => {
+        const postId = encodeURI(window.location.href);
 
+        // Facebook
+        const fb =
+          button.parentElement.parentElement.querySelector("a.facebook");
+        fb.href = `https://www.facebook.com/sharer.php?u=${postId}`;
 
-        <script>
-            // Function to validate form inputs and display image preview
-            function validateInputs() {
-                // Get input values
-                var title = document.getElementById('title').value.trim();
-                var content = document.getElementById('content').value.trim();
-                var fileInput = document.getElementById('image').value; // Check if file is selected
+        // Twitter
+        const twitter =
+          button.parentElement.parentElement.querySelector("a.twitter");
+        twitter.href = `https://twitter.com/share?url=${postId}&text=Check out this post!`;
 
-                // Validate title length
-                var titleError = document.querySelector('.title-error');
-                if (title.length > 70) {
-                    titleError.style.display = 'block';
-                } else {
-                    titleError.style.display = 'none';
-                }
+        // Messenger
+        const messenger =
+          button.parentElement.parentElement.querySelector("a.messenger");
+        messenger.href = `fb-messenger://share?link=${postId}`;
+      });
+    </script>
 
-                // Validate content word count
-                var contentError = document.querySelector('.content-error');
-                if (content.length > 4000) {
-                    contentError.style.display = 'block';
-                } else {
-                    contentError.style.display = 'none';
-                }
+    <script>
+      function formatPostDate(date) {
+        const currentDate = new Date();
+        const postDate = new Date(date);
+        const timeDifference = currentDate.getTime() - postDate.getTime();
 
-                // Enable/disable submit button based on input validity
-                var submitButton = document.getElementById('submitButton');
-                if ((title.length <= 70 || content.length <= 4000) && (title.length > 0 || content.length > 0 || fileInput)) {
-                    submitButton.disabled = false;
-                } else {
-                    submitButton.disabled = true;
-                }
+        // Convert milliseconds to seconds
+        const seconds = Math.floor(timeDifference / 1000);
 
-                // Display selected image preview
-                var imagePreview = document.getElementById('imagePreview');
-                if (fileInput) {
-                    var file = document.getElementById('image').files[0];
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result;
-                        imagePreview.style.display = 'block';
-                    }
-                    reader.readAsDataURL(file);
-                } else {
-                    imagePreview.src = '';
-                    imagePreview.style.display = 'none';
-                }
+        // Calculate the appropriate time units
+        const intervals = {
+          year: 31536000,
+          month: 2592000,
+          week: 604800,
+          day: 86400,
+          hour: 3600,
+          minute: 60,
+        };
+
+        let timeAgo;
+        for (const [unit, secondsPerUnit] of Object.entries(intervals)) {
+          const interval = Math.floor(seconds / secondsPerUnit);
+          if (interval > 0) {
+            timeAgo = `${interval} ${unit}${interval !== 1 ? "s" : ""} ago`;
+            break;
+          }
+        }
+
+        return timeAgo || "Just now";
+      }
+
+      const assigningTimeOnComment =
+        document.querySelectorAll("p.comment-date");
+      assigningTimeOnComment.forEach((comment) => {
+        const time = comment.getAttribute("comment-time");
+        const formattedTime = formatPostDate(time);
+        comment.innerText = formattedTime;
+      });
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const moreButtons = document.querySelectorAll(".more");
+
+        moreButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            event.stopPropagation(); // Prevent the click event from propagating to the document body
+
+            // Find the corresponding delete button
+            const deleteButton = this.parentElement.querySelector(
+              ".post-delete-button"
+            );
+
+            // Toggle the 'active' class of the delete button
+            deleteButton.classList.toggle("active");
+          });
+        });
+
+        document.body.addEventListener("click", function (event) {
+          const target = event.target;
+
+          // Check if the click target is not the more button or the delete button
+          if (
+            !target.classList.contains("more") &&
+            !target.closest(".post-delete-button")
+          ) {
+            // Close all delete buttons by removing the 'active' class
+            const activeDeleteButtons = document.querySelectorAll(
+              ".post-delete-button.active"
+            );
+            activeDeleteButtons.forEach((button) => {
+              button.classList.remove("active");
+            });
+          }
+        });
+      });
+    </script>
+
+    <!-- JavaScript to handle the delete button click -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const deleteButtons = document.querySelectorAll(".post-delete-button");
+
+        deleteButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            const postId = button.getAttribute("data-post-id");
+            console.log(postId);
+            const confirmation = confirm(
+              "Are you sure you want to delete this post?"
+            );
+
+            if (confirmation) {
+              // Send AJAX request to delete the post
+              fetch(`/post/${postId}`, {
+                method: "DELETE",
+              })
+                .then((response) => {
+                  if (response.ok) {
+                    // Remove the post element from the UI
+                    const postElement = button.closest("section");
+                    postElement.remove();
+
+                    // Redirect to the index page
+                    window.location.href = "/index";
+                  } else {
+                    throw new Error("Failed to delete post");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error deleting post:", error);
+                  alert("Failed to delete post");
+                });
             }
-        </script>
+          });
+        });
+      });
+    </script>
 
-
-
-        <!-- show and hide logout out -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const popUpButton = document.querySelector("#left-side div.bottom-logout");
-                const popUp = document.querySelector("#left-side div.pop-up");
-
-                // Toggle the 'active' class for the popup when the button is clicked
-                popUpButton.addEventListener("click", function (event) {
-                    event.stopPropagation(); // Prevent the click event from bubbling up to the document
-                    popUp.classList.toggle("active");
-                });
-
-                // Close the popup when clicking outside of it
-                document.addEventListener('click', function (event) {
-                    const clickedElement = event.target;
-                    if (!popUp.contains(clickedElement) && !popUpButton.contains(clickedElement)) {
-                        popUp.classList.remove("active");
-                    }
-                });
+    <!-- delete note -->
+    <script>
+      document.querySelectorAll(".delete-note-form").forEach((form) => {
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const confirmation = confirm(
+            "Are you sure you want to delete this note?"
+          );
+          if (confirmation) {
+            const response = await fetch(form.action, {
+              method: "DELETE",
             });
-        </script>
-
-
-
-
-
-        <!-- show an dhide pop up -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const postShareButtons = document.querySelectorAll('.post-share-button');
-
-                postShareButtons.forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        // Toggle 'active' class for the share icon associated with the clicked post-share-button
-                        const shareIcon = this.parentElement.querySelector('.share-icon');
-                        const isActive = shareIcon.classList.contains('active');
-                        const allShareIcons = document.querySelectorAll('.share-icon');
-
-                        // Remove 'active' class from all share icons
-                        allShareIcons.forEach(function (icon) {
-                            icon.classList.remove('active');
-                        });
-
-                        // Toggle 'active' class for the clicked share icon
-                        if (!isActive) {
-                            shareIcon.classList.add('active');
-                        }
-                    });
-                });
-
-                // Close share icon popups when clicking outside
-                document.addEventListener('click', function (event) {
-                    const clickedElement = event.target;
-                    if (!clickedElement.closest('.post-share-button')) {
-                        const allShareIcons = document.querySelectorAll('.share-icon');
-                        allShareIcons.forEach(function (icon) {
-                            icon.classList.remove('active');
-                        });
-                    }
-                });
-            });
-        </script>
-
-
-
-
-        <!-- share your post on social media -->
-        <script>
-            const postShareButtons = document.querySelectorAll('.post-share-button');
-            postShareButtons.forEach((button) => {
-                const postId = encodeURI(window.location.href)
-
-                // Facebook
-                const fb = button.parentElement.parentElement.querySelector("a.facebook");
-                fb.href = `https://www.facebook.com/sharer.php?u=${postId}`;
-
-                // Twitter
-                const twitter = button.parentElement.parentElement.querySelector("a.twitter");
-                twitter.href = `https://twitter.com/share?url=${postId}&text=Check out this post!`;
-
-                // Messenger
-                const messenger = button.parentElement.parentElement.querySelector("a.messenger");
-                messenger.href = `fb-messenger://share?link=${postId}`;
-            });
-        </script>
-
-
-
-        <script>
-            function formatPostDate(date) {
-                const currentDate = new Date();
-                const postDate = new Date(date);
-                const timeDifference = currentDate.getTime() - postDate.getTime();
-
-                // Convert milliseconds to seconds
-                const seconds = Math.floor(timeDifference / 1000);
-
-                // Calculate the appropriate time units
-                const intervals = {
-                    year: 31536000,
-                    month: 2592000,
-                    week: 604800,
-                    day: 86400,
-                    hour: 3600,
-                    minute: 60
-                };
-
-                let timeAgo;
-                for (const [unit, secondsPerUnit] of Object.entries(intervals)) {
-                    const interval = Math.floor(seconds / secondsPerUnit);
-                    if (interval > 0) {
-                        timeAgo = `${interval} ${unit}${interval !== 1 ? 's' : ''} ago`;
-                        break;
-                    }
-                }
-
-                return timeAgo || 'Just now';
+            if (response.ok) {
+              // Note deleted, reload the page
+              location.reload();
+            } else {
+              alert("Failed to delete note");
             }
-
-            const assigningTimeOnComment = document.querySelectorAll("p.comment-date");
-            assigningTimeOnComment.forEach(comment => {
-                const time = comment.getAttribute("comment-time");
-                const formattedTime = formatPostDate(time);
-                comment.innerText = formattedTime;
-            });
-        </script>
-
-
-
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const moreButtons = document.querySelectorAll('.more');
-
-                moreButtons.forEach(button => {
-                    button.addEventListener('click', function (event) {
-                        event.stopPropagation(); // Prevent the click event from propagating to the document body
-
-                        // Find the corresponding delete button
-                        const deleteButton = this.parentElement.querySelector('.post-delete-button');
-
-                        // Toggle the 'active' class of the delete button
-                        deleteButton.classList.toggle('active');
-                    });
-                });
-
-                document.body.addEventListener('click', function (event) {
-                    const target = event.target;
-
-                    // Check if the click target is not the more button or the delete button
-                    if (!target.classList.contains('more') && !target.closest('.post-delete-button')) {
-                        // Close all delete buttons by removing the 'active' class
-                        const activeDeleteButtons = document.querySelectorAll('.post-delete-button.active');
-                        activeDeleteButtons.forEach(button => {
-                            button.classList.remove('active');
-                        });
-                    }
-                });
-            });
-        </script>
-
-
-        <!-- JavaScript to handle the delete button click -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const deleteButtons = document.querySelectorAll('.post-delete-button');
-
-
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function (event) {
-                        event.preventDefault();
-
-                        const postId = button.getAttribute('data-post-id');
-                        console.log(postId)
-                        const confirmation = confirm('Are you sure you want to delete this post?');
-
-                        if (confirmation) {
-                            // Send AJAX request to delete the post
-                            fetch(`/post/${postId}`, {
-                                method: 'DELETE'
-                            })
-                                .then(response => {
-                                    if (response.ok) {
-                                        // Remove the post element from the UI
-                                        const postElement = button.closest('section');
-                                        postElement.remove();
-
-                                        // Redirect to the index page
-                                        window.location.href = '/index';
-                                    } else {
-                                        throw new Error('Failed to delete post');
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error deleting post:', error);
-                                    alert('Failed to delete post');
-                                });
-                        }
-                    });
-                });
-            });
-        </script>
-
-
-        <!-- delete note -->
-        <script>
-            document.querySelectorAll('.delete-note-form').forEach(form => {
-                form.addEventListener('submit', async function (event) {
-                    event.preventDefault();
-                    const confirmation = confirm('Are you sure you want to delete this note?');
-                    if (confirmation) {
-                        const response = await fetch(form.action, {
-                            method: 'DELETE'
-                        });
-                        if (response.ok) {
-                            // Note deleted, reload the page
-                            location.reload();
-                        } else {
-                            alert('Failed to delete note');
-                        }
-                    }
-                });
-            });
-        </script>
-
-
-
-</body>
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

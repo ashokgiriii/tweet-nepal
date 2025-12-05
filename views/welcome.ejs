@@ -121,11 +121,39 @@
       text-decoration: underline;
     }
 
-    .usernameAvailable {
-      color: #ff6b6b;
-      font-size: 0.95em;
+    .error-message {
+      color: #ff4444;
+      font-size: 0.85rem;
       min-height: 1.2em;
-      margin-bottom: 0.5em;
+      margin-top: -0.8rem;
+      margin-bottom: 0.5rem;
+      padding-left: 0.25rem;
+      display: block;
+      font-weight: 500;
+    }
+
+    .error-message.hidden {
+      display: none;
+    }
+
+    .usernameAvailable {
+      color: #ff4444;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+      margin-top: -0.8rem;
+      margin-bottom: 0.5rem;
+      padding-left: 0.25rem;
+      font-weight: 500;
+    }
+
+    input.form_style.error {
+      border-color: #ff4444;
+      background: rgba(255, 68, 68, 0.1);
+    }
+
+    input.form_style:focus.error {
+      border-color: #ff4444;
+      box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2);
     }
 
     @media (max-width: 500px) {
@@ -148,14 +176,22 @@
         <p class="title">Sign Up</p>
         <p class="sub_title">Create your Tweet Nepal account</p>
         <form action="/createUser" method="post" autocomplete="off" onsubmit="return validateForm()">
-          <input placeholder="Enter Your Name" class="form_style" type="text" name="name" id="name">
-          <input placeholder="Enter Your Password" id="password" class="form_style" name="password" type="password">
+          <input placeholder="Enter Your Name" class="form_style" type="text" name="name" id="name" oninput="validateName()">
+          <span class="error-message hidden" id="nameError"></span>
+          
+          <input placeholder="Enter Your Password" id="password" class="form_style" name="password" type="password" oninput="validatePassword()">
+          <span class="error-message hidden" id="passwordError"></span>
+          
           <input placeholder="Enter Your Username" class="form_style" type="text" name="username" id="username"
-            onkeyup="checkUsernameAvailability()">
+            onkeyup="checkUsernameAvailability()" oninput="validateUsername()">
           <p class="usernameAvailable" id="usernameMessage"></p>
+          <span class="error-message hidden" id="usernameError"></span>
+          
           <button class="btn" id="submitButton" type="submit">Sign Up</button>
           <div>
-            <span>Have an account? <a class="link" href="#login">Login here</a></span>
+            <span style="color: white;">Have an account ? 
+            </span>
+            <a class="link" href="#login">Login here</a>
           </div>
         </form>
       </div>
@@ -167,11 +203,13 @@
         <p class="title">Log In</p>
         <p class="sub_title">Welcome back! Please log in.</p>
         <form action="/login" method="post" autocomplete="off">
-          <input placeholder="Enter your username" class="form_style" type="text" name="username" id="login-username">
-          <input placeholder="Enter your password" class="form_style" type="password" name="password">
+          <input style="width: 90%;" placeholder="Enter your username" class="form_style" type="text" name="username" id="login-username">
+          <input style="width: 90%;" placeholder="Enter your password" class="form_style" type="password" name="password">
           <button class="btn">Log In</button>
           <div>
-            <span>New here? <a class="link" href="#signup">Sign up here</a></span>
+            <span style="color: white;">New here ? 
+            </span>
+            <a class="link" href="#signup">Sign up here</a>
           </div>
         </form>
       </div>
@@ -214,23 +252,100 @@
       }
     }
 
-    function validateForm() {
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(fieldId + 'Error');
+      
+      if (field && errorElement) {
+        field.classList.add('error');
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+      }
+    }
+
+    function hideError(fieldId) {
+      const field = document.getElementById(fieldId);
+      const errorElement = document.getElementById(fieldId + 'Error');
+      
+      if (field && errorElement) {
+        field.classList.remove('error');
+        errorElement.classList.add('hidden');
+      }
+    }
+
+    function validateName() {
       const name = document.getElementById('name').value.trim();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-
+      
+      if (!name) {
+        showError('name', 'Name is required');
+        return false;
+      }
+      
       if (!isValidProperName(name)) {
-        alert("Please enter a valid name with only alphabetic characters (one word only).");
+        showError('name', 'Name should contain only letters and spaces (max 3 words)');
         return false;
       }
+      
+      hideError('name');
+      return true;
+    }
 
+    function validateUsername() {
+      const username = document.getElementById('username').value.trim();
+      
+      if (!username) {
+        showError('username', 'Username is required');
+        return false;
+      }
+      
+      if (username.length < 3) {
+        showError('username', 'Username must be at least 3 characters');
+        return false;
+      }
+      
       if (!isValidUsername(username)) {
-        alert("Please enter a valid username. It should start with a letter and contain only letters and numbers.");
+        showError('username', 'Username must start with a letter and contain only letters and numbers');
+        return false;
+      }
+      
+      hideError('username');
+      checkUsernameAvailability();
+      return true;
+    }
+
+    function validatePassword() {
+      const password = document.getElementById('password').value.trim();
+      
+      if (!password) {
+        showError('password', 'Password is required');
+        return false;
+      }
+      
+      if (password.length < 8) {
+        showError('password', 'Password must be at least 8 characters long');
+        return false;
+      }
+      
+      if (!isValidPassword(password)) {
+        showError('password', 'Password must include uppercase, lowercase, and a digit');
+        return false;
+      }
+      
+      hideError('password');
+      return true;
+    }
+
+    function validateForm() {
+      const nameValid = validateName();
+      const usernameValid = validateUsername();
+      const passwordValid = validatePassword();
+
+      if (!nameValid || !usernameValid || !passwordValid) {
         return false;
       }
 
-      if (!isValidPassword(password)) {
-        alert("Password must be at least 8 characters long and include one uppercase letter, one lowercase letter, and one digit.");
+      const usernameMessage = document.getElementById('usernameMessage');
+      if (usernameMessage.textContent === 'Username already exists') {
         return false;
       }
 
