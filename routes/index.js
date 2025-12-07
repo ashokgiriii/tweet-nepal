@@ -348,35 +348,32 @@ router.post("/like/post/:id", isLoggedIn, async function (req, res) {
   }
 });
 
-
-// creating user
 router.post('/createUser', async function (req, res, next) {
   try {
-    // Check if the username already exists in the database
-    const existingUser = await userModel.findOne({ username: req.body.username }).exec();
+    // Check existing username
+    const existingUser = await userModel.findOne({ username: req.body.username });
     if (existingUser) {
-      // If the username already exists, render the signup page with an error message
       return res.render('welcome', { isAuthenticated: false, message: 'Username already exists' });
     }
 
-    // If the username is not taken, proceed with creating the new user
+    // Create user WITHOUT password
     const userData = new userModel({
       username: req.body.username,
       name: req.body.name,
-      password: req.body.password,
     });
 
-
-
+    // Let passport-local-mongoose handle hashing + saving
     await userModel.register(userData, req.body.password);
+
     passport.authenticate('local')(req, res, function () {
       res.redirect('/index');
     });
-  } catch (error) {
-    // Handle any errors that occur during the process
-    next(error);
+
+  } catch (err) {
+    next(err);
   }
 });
+
 
 
 
